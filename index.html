@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ôn tập HSK (3.0) - Chọn cấp độ</title>
+<link rel="icon" type="image/png" href="assets/icons/favicon-root.png">
+<link rel="stylesheet" href="style.css">
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-205LXB6XP1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-205LXB6XP1');
+</script>
+<script src="streak.js"></script>
+</head>
+<body>
+
+<div class="level-picker">
+  <div class="level-picker-inner">
+    <div class="streak-row">
+      <div class="streak-badge on-light gray" id="streakBadge">
+        <span class="streak-flame-wrap"><span class="streak-flame">🔥</span></span>
+        <span class="streak-text"><span class="streak-count">0</span> ngày liên tiếp</span>
+      </div>
+    </div>
+    <!-- <div class="streak-debug-row">
+      <span>Debug:</span>
+      <button type="button" onclick="debugStreakContinue()">Nối chuỗi</button>
+      <button type="button" onclick="debugStreakBreak()">Cắt chuỗi</button>
+    </div> -->
+    <div class="level-picker-head">
+      <h1>欢迎 · Chọn cấp độ ôn tập</h1>
+      <p>Ôn tập từ vựng, ngữ pháp và bài khóa theo giáo trình <b>新HSK教程</b> (HSK 3.0, bản tiếng Việt).</p>
+      <button type="button" class="btn btn-ghost" id="featuresBtn" onclick="document.getElementById('featuresModal').classList.add('show')">Xem các chức năng chính</button>
+      <button type="button" class="btn btn-ghost" id="adminBtn">Đăng nhập Admin</button>
+    </div>
+    <div class="level-grid">
+      <a class="level-card" href="hsk1/index.html">
+        <img class="level-cover" src="assets/covers/hsk1-cover.jpg" alt="新HSK教程1">
+        <div class="level-info">
+          <span class="level-badge badge-hsk1">HSK1</span>
+          <div class="level-meta">15 bài học</div>
+        </div>
+      </a>
+      <a class="level-card" href="hsk2/index.html">
+        <img class="level-cover" src="assets/covers/hsk2-cover.jpg" alt="新HSK教程2">
+        <div class="level-info">
+          <span class="level-badge badge-hsk2">HSK2</span>
+          <div class="level-meta">15 bài học</div>
+        </div>
+      </a>
+      <a class="level-card" href="hsk3/index.html">
+        <img class="level-cover" src="assets/covers/hsk3-cover.jpg" alt="新HSK教程3">
+        <div class="level-info">
+          <span class="level-badge badge-hsk3">HSK3</span>
+          <div class="level-meta">18 bài học</div>
+        </div>
+      </a>
+      <a class="level-card" href="hsk4/index.html">
+        <img class="level-cover" src="assets/covers/hsk4-cover.jpg" alt="新HSK教程4（上·下）">
+        <div class="level-info">
+          <span class="level-badge badge-hsk4">HSK4</span>
+          <div class="level-meta">20 bài học</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="featuresModal">
+  <div class="modal features-modal">
+    <div class="flashcard-header">
+      <span>Các chức năng chính</span>
+      <button type="button" class="icon-btn" onclick="document.getElementById('featuresModal').classList.remove('show')">✕</button>
+    </div>
+    <ul class="features-list">
+      <li><strong>Chọn cấp độ</strong> &ndash; HSK1 đến HSK4, mỗi cấp độ gồm nhiều bài học theo giáo trình New HSK 教程 (chuẩn 3.0).</li>
+      <li><strong>Ngữ pháp &amp; bài khóa</strong> &ndash; ôn lại điểm ngữ pháp và nội dung bài khóa (kèm file audio chuẩn) của từng bài.</li>
+      <li><strong>Học từ vựng</strong> &ndash; xem Hán tự, pinyin, nghĩa tiếng Việt và luyện với flashcard lật thẻ.</li>
+      <li><strong>Luyện viết chữ</strong> &ndash; tập viết theo thứ tự nét (stroke order) cho từng Hán tự.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Admin Login Modal -->
+<div class="modal-overlay" id="adminLoginModal">
+  <div class="modal admin-modal">
+    <div class="flashcard-header">
+      <span>Đăng nhập Admin</span>
+      <button type="button" class="icon-btn" id="adminLoginClose">✕</button>
+    </div>
+    <form id="adminLoginForm" class="admin-form" autocomplete="off">
+      <div class="admin-field">
+        <label for="adminUser">Tài khoản</label>
+        <input type="text" id="adminUser" placeholder="Nhập tài khoản…" required>
+      </div>
+      <div class="admin-field">
+        <label for="adminPass">Mật khẩu</label>
+        <input type="password" id="adminPass" placeholder="Nhập mật khẩu…" required>
+      </div>
+      <div class="admin-error" id="adminLoginError"></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Đăng nhập</button>
+    </form>
+  </div>
+</div>
+
+<!-- Admin Dashboard Modal -->
+<div class="modal-overlay" id="adminDashboardModal">
+  <div class="modal admin-dashboard-modal">
+    <div class="flashcard-header">
+      <span>Bảng điều khiển Admin</span>
+      <button type="button" class="icon-btn" id="adminDashClose">✕</button>
+    </div>
+    <div class="admin-dash-body">
+      <div class="admin-dash-banner">
+        <div>
+          <div class="admin-dash-title">Xin chào, <strong>admin</strong></div>
+          <div class="admin-dash-sub">Hệ thống ôn tập 新HSK教程 (HSK 3.0) · 4 cấp độ · 68 bài học</div>
+        </div>
+        <button type="button" class="btn btn-wrong" id="adminLogoutBtn" style="flex:none; padding:8px 14px; font-size:13px;">Đăng xuất</button>
+      </div>
+      <div class="admin-stats-grid">
+        <a class="admin-stat-box" href="hsk1/index.html"><div class="num">15</div><div class="lbl">Bài HSK1</div></a>
+        <a class="admin-stat-box" href="hsk2/index.html"><div class="num">15</div><div class="lbl">Bài HSK2</div></a>
+        <a class="admin-stat-box" href="hsk3/index.html"><div class="num">18</div><div class="lbl">Bài HSK3</div></a>
+        <a class="admin-stat-box" href="hsk4/index.html"><div class="num">20</div><div class="lbl">Bài HSK4</div></a>
+      </div>
+      <div class="admin-dash-note">
+        Chế độ quản trị đã kích hoạt trong phiên làm việc hiện tại. Bạn có thể chọn các chức năng quản trị muốn triển khai tiếp theo (chỉnh sửa dữ liệu, kiểm duyệt lỗi, quản lý học viên, xuất/nhập JSON…).
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const ADMIN_SESSION_KEY = 'hsk_admin_logged_in';
+  const adminBtn = document.getElementById('adminBtn');
+  const loginModal = document.getElementById('adminLoginModal');
+  const dashModal = document.getElementById('adminDashboardModal');
+  const loginForm = document.getElementById('adminLoginForm');
+  const userInput = document.getElementById('adminUser');
+  const passInput = document.getElementById('adminPass');
+  const errorEl = document.getElementById('adminLoginError');
+
+  function isLoggedIn() {
+    try { return sessionStorage.getItem(ADMIN_SESSION_KEY) === '1'; }
+    catch (e) { return false; }
+  }
+  function updateAdminBtn() {
+    adminBtn.textContent = isLoggedIn() ? 'Quản trị (Admin)' : 'Đăng nhập Admin';
+  }
+  function openLogin() {
+    errorEl.textContent = '';
+    loginForm.reset();
+    loginModal.classList.add('show');
+    setTimeout(() => userInput.focus(), 50);
+  }
+  function openDashboard() {
+    dashModal.classList.add('show');
+  }
+
+  adminBtn.addEventListener('click', () => {
+    if (isLoggedIn()) openDashboard();
+    else openLogin();
+  });
+
+  document.getElementById('adminLoginClose').addEventListener('click', () => loginModal.classList.remove('show'));
+  document.getElementById('adminDashClose').addEventListener('click', () => dashModal.classList.remove('show'));
+
+  [loginModal, dashModal, document.getElementById('featuresModal')].forEach(ov => {
+    ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('show'); });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      loginModal.classList.remove('show');
+      dashModal.classList.remove('show');
+      document.getElementById('featuresModal').classList.remove('show');
+    }
+  });
+
+  loginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const u = userInput.value.trim();
+    const p = passInput.value;
+    if (u === 'admin' && p === '24121996') {
+      try { sessionStorage.setItem(ADMIN_SESSION_KEY, '1'); } catch (err) {}
+      loginModal.classList.remove('show');
+      updateAdminBtn();
+      openDashboard();
+    } else {
+      errorEl.textContent = 'Sai tài khoản hoặc mật khẩu. Vui lòng thử lại.';
+      passInput.select();
+    }
+  });
+
+  document.getElementById('adminLogoutBtn').addEventListener('click', () => {
+    try { sessionStorage.removeItem(ADMIN_SESSION_KEY); } catch (err) {}
+    dashModal.classList.remove('show');
+    updateAdminBtn();
+  });
+
+  updateAdminBtn();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,5 @@
+# Raw textbook source files (already extracted into Audio/HSK4, assets/texts/hsk4, hsk4/data.js)
+hsk4/HSK4 下.pdf
+hsk4/audioHSK4 下/
+.DS_Store
+Thumbs.db
