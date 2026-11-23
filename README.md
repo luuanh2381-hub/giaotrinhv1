@@ -50,4 +50,4 @@ Then open `http://localhost:8080`.
 
 ## Tech Stack
 
-Vanilla HTML, CSS, and JavaScript (no framework, no bundler). Stroke-order rendering is powered by [HanziWriter](https://hanziwriter.org/).
+Vanilla HTML, CSS, and JavaScript (no framework, no bundler). Stroke-order rendering is powered by [HanziWriter](https://hanziwriter.org/).tuan
