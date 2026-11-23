@@ -3,3 +3,7 @@ hsk4/HSK4 下.pdf
 hsk4/audioHSK4 下/
 .DS_Store
 Thumbs.db
+node_modules/
+.env
+.env.local
+.vercel/

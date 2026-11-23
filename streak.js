@@ -94,6 +94,9 @@
       event = 'reset';
     }
     writeRaw(data);
+    if (window.HSKTracker) {
+      window.HSKTracker.trackStreak(data.count, event);
+    }
 
     if (event === 'same') showStatic(data.count, 'lit');
     else if (event === 'first') playFirstVisit();

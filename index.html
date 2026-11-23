@@ -16,6 +16,7 @@
 
   gtag('config', 'G-205LXB6XP1');
 </script>
+<script src="tracker.js"></script>
 <script src="streak.js"></script>
 </head>
 <body>
@@ -104,110 +105,25 @@
         <input type="password" id="adminPass" placeholder="Nhập mật khẩu…" required>
       </div>
       <div class="admin-error" id="adminLoginError"></div>
-      <button type="submit" class="btn btn-primary" style="width:100%;">Đăng nhập</button>
+      <button type="submit" class="btn btn-primary" id="adminLoginSubmit" style="width:100%;">Đăng nhập</button>
     </form>
   </div>
 </div>
 
 <!-- Admin Dashboard Modal -->
 <div class="modal-overlay" id="adminDashboardModal">
-  <div class="modal admin-dashboard-modal">
+  <div class="modal admin-dashboard-modal admin-dashboard-wide">
     <div class="flashcard-header">
-      <span>Bảng điều khiển Admin</span>
+      <span>Bảng điều khiển Admin · Thống kê &amp; Bảo mật IP</span>
       <button type="button" class="icon-btn" id="adminDashClose">✕</button>
     </div>
-    <div class="admin-dash-body">
-      <div class="admin-dash-banner">
-        <div>
-          <div class="admin-dash-title">Xin chào, <strong>admin</strong></div>
-          <div class="admin-dash-sub">Hệ thống ôn tập 新HSK教程 (HSK 3.0) · 4 cấp độ · 68 bài học</div>
-        </div>
-        <button type="button" class="btn btn-wrong" id="adminLogoutBtn" style="flex:none; padding:8px 14px; font-size:13px;">Đăng xuất</button>
-      </div>
-      <div class="admin-stats-grid">
-        <a class="admin-stat-box" href="hsk1/index.html"><div class="num">15</div><div class="lbl">Bài HSK1</div></a>
-        <a class="admin-stat-box" href="hsk2/index.html"><div class="num">15</div><div class="lbl">Bài HSK2</div></a>
-        <a class="admin-stat-box" href="hsk3/index.html"><div class="num">18</div><div class="lbl">Bài HSK3</div></a>
-        <a class="admin-stat-box" href="hsk4/index.html"><div class="num">20</div><div class="lbl">Bài HSK4</div></a>
-      </div>
-      <div class="admin-dash-note">
-        Chế độ quản trị đã kích hoạt trong phiên làm việc hiện tại. Bạn có thể chọn các chức năng quản trị muốn triển khai tiếp theo (chỉnh sửa dữ liệu, kiểm duyệt lỗi, quản lý học viên, xuất/nhập JSON…).
-      </div>
+    <div class="admin-dash-body" id="adminDashBody">
+      <div class="adm-loading">Đang khởi tạo bảng điều khiển…</div>
     </div>
   </div>
 </div>
 
-<script>
-(function () {
-  const ADMIN_SESSION_KEY = 'hsk_admin_logged_in';
-  const adminBtn = document.getElementById('adminBtn');
-  const loginModal = document.getElementById('adminLoginModal');
-  const dashModal = document.getElementById('adminDashboardModal');
-  const loginForm = document.getElementById('adminLoginForm');
-  const userInput = document.getElementById('adminUser');
-  const passInput = document.getElementById('adminPass');
-  const errorEl = document.getElementById('adminLoginError');
-
-  function isLoggedIn() {
-    try { return sessionStorage.getItem(ADMIN_SESSION_KEY) === '1'; }
-    catch (e) { return false; }
-  }
-  function updateAdminBtn() {
-    adminBtn.textContent = isLoggedIn() ? 'Quản trị (Admin)' : 'Đăng nhập Admin';
-  }
-  function openLogin() {
-    errorEl.textContent = '';
-    loginForm.reset();
-    loginModal.classList.add('show');
-    setTimeout(() => userInput.focus(), 50);
-  }
-  function openDashboard() {
-    dashModal.classList.add('show');
-  }
-
-  adminBtn.addEventListener('click', () => {
-    if (isLoggedIn()) openDashboard();
-    else openLogin();
-  });
-
-  document.getElementById('adminLoginClose').addEventListener('click', () => loginModal.classList.remove('show'));
-  document.getElementById('adminDashClose').addEventListener('click', () => dashModal.classList.remove('show'));
-
-  [loginModal, dashModal, document.getElementById('featuresModal')].forEach(ov => {
-    ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('show'); });
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      loginModal.classList.remove('show');
-      dashModal.classList.remove('show');
-      document.getElementById('featuresModal').classList.remove('show');
-    }
-  });
-
-  loginForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const u = userInput.value.trim();
-    const p = passInput.value;
-    if (u === 'admin' && p === '24121996') {
-      try { sessionStorage.setItem(ADMIN_SESSION_KEY, '1'); } catch (err) {}
-      loginModal.classList.remove('show');
-      updateAdminBtn();
-      openDashboard();
-    } else {
-      errorEl.textContent = 'Sai tài khoản hoặc mật khẩu. Vui lòng thử lại.';
-      passInput.select();
-    }
-  });
-
-  document.getElementById('adminLogoutBtn').addEventListener('click', () => {
-    try { sessionStorage.removeItem(ADMIN_SESSION_KEY); } catch (err) {}
-    dashModal.classList.remove('show');
-    updateAdminBtn();
-  });
-
-  updateAdminBtn();
-})();
-</script>
+<script src="admin.js"></script>
 
 </body>
 </html>

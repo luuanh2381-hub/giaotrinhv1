@@ -34,6 +34,8 @@ function toggleKnown(key) {
   if (knownMap[key]) delete knownMap[key];
   else knownMap[key] = true;
   localStorage.setItem(KNOWN_KEY, JSON.stringify(knownMap));
+  const lid = parseInt(String(key).split('__')[0], 10);
+  if (window.HSKTracker && lid) window.HSKTracker.trackKnown(APP_CONFIG.level, lid);
 }
 function knownCount() { return Object.keys(knownMap).length; }
 
@@ -95,11 +97,27 @@ function route() {
     const id = parseInt(parts[1], 10);
     const tab = parts[2] || 'vocab';
     const lesson = LESSONS.find(l => l.id === id);
-    if (lesson) { renderLesson(main, lesson, tab); highlightNav(`lesson-${id}`); return; }
+    if (lesson) {
+      renderLesson(main, lesson, tab);
+      highlightNav(`lesson-${id}`);
+      if (window.HSKTracker) window.HSKTracker.trackLesson(APP_CONFIG.level, lesson.id, tab);
+      return;
+    }
   }
-  if (parts[0] === 'vocab-all') { renderVocabAll(main); highlightNav('vocab-all'); return; }
-  if (parts[0] === 'flashcard') { renderFlashcardSetup(main); highlightNav('flashcard'); return; }
+  if (parts[0] === 'vocab-all') {
+    renderVocabAll(main);
+    highlightNav('vocab-all');
+    if (window.HSKTracker) window.HSKTracker.trackPageView(APP_CONFIG.level);
+    return;
+  }
+  if (parts[0] === 'flashcard') {
+    renderFlashcardSetup(main);
+    highlightNav('flashcard');
+    if (window.HSKTracker) window.HSKTracker.trackPageView(APP_CONFIG.level);
+    return;
+  }
   renderHome(main); highlightNav('home');
+  if (window.HSKTracker) window.HSKTracker.trackPageView(APP_CONFIG.level);
 }
 window.addEventListener('hashchange', route);
 
@@ -243,6 +261,7 @@ function renderVocabAll(main) {
   `;
   const search = document.getElementById('vocabAllSearch');
   const lessonSel = document.getElementById('vocabAllLesson');
+  let searchTrackTimer = null;
   function renderList() {
     const q = search.value.trim().toLowerCase();
     const lid = lessonSel.value;
@@ -251,6 +270,13 @@ function renderVocabAll(main) {
     if (q) items = items.filter(v =>
       v.hanzi.includes(q) || v.pinyin.toLowerCase().includes(q) || (v.vn || '').toLowerCase().includes(q)
     );
+    clearTimeout(searchTrackTimer);
+    if (q.length >= 2 && window.HSKTracker) {
+      const count = items.length;
+      searchTrackTimer = setTimeout(() => {
+        window.HSKTracker.trackSearch(APP_CONFIG.level, q, count);
+      }, 900);
+    }
     const listEl = document.getElementById('vocabAllList');
     if (!items.length) {
       listEl.innerHTML = `<div class="empty-state">Không tìm thấy từ nào khớp.</div>`;
@@ -659,7 +685,21 @@ function renderTextsTab(el, lesson) {
     span.addEventListener('click', () => {
       const hanzi = decodeURIComponent(span.getAttribute('data-hanzi'));
       const v = lesson.vocab.find(x => x.hanzi === hanzi);
-      if (v) openWordModal(v);
+      if (v) openWordModal({ ...v, lessonId: lesson.id });
+    });
+  });
+  el.querySelectorAll('audio').forEach(aud => {
+    let tracked = false;
+    aud.addEventListener('play', () => {
+      if (!tracked && window.HSKTracker) {
+        tracked = true;
+        window.HSKTracker.trackAudio(APP_CONFIG.level, lesson.id);
+      }
+    });
+    aud.addEventListener('error', () => {
+      if (window.HSKTracker) {
+        window.HSKTracker.trackError('audio_error', APP_CONFIG.level, aud.getAttribute('src') || '', `Lesson ${lesson.id} audio failed to load`);
+      }
     });
   });
   attachVocabRowEvents(el);
@@ -765,6 +805,7 @@ function showFlashcard() {
 function fcNext(correct) {
   const v = fcDeck[fcIndex];
   if (v) {
+    if (window.HSKTracker) window.HSKTracker.trackFlashcard(APP_CONFIG.level, v, correct);
     if (correct && !isKnown(v.key)) toggleKnown(v.key);
     if (!correct && isKnown(v.key)) toggleKnown(v.key);
   }
@@ -776,8 +817,10 @@ function fcNext(correct) {
 let strokeChars = [];
 let strokeActiveIndex = 0;
 let strokeWriter = null;
+let strokeCurrentVocab = null;
 
 function openStrokeModal(v) {
+  strokeCurrentVocab = v;
   strokeChars = v.hanzi.split('');
   strokeActiveIndex = 0;
   document.getElementById('strokeWordHanzi').textContent = v.hanzi;
@@ -818,7 +861,12 @@ function loadStrokeChar() {
     outlineColor: '#ece4d8',
     radicalColor: '#f5821f',
     strokeAnimationSpeed: 1,
-    delayBetweenStrokes: 300
+    delayBetweenStrokes: 300,
+    onLoadCharDataError: () => {
+      if (window.HSKTracker) {
+        window.HSKTracker.trackError('stroke_error', APP_CONFIG.level, char, 'HanziWriter failed to load char data');
+      }
+    }
   });
 }
 
@@ -839,7 +887,12 @@ function strokeQuiz() {
     showHintAfterMisses: 3,
     onMistake: data => setStrokeFeedback(`Chưa đúng, thử lại nét ${data.strokeNum + 1}…`, 'warn'),
     onCorrectStroke: data => setStrokeFeedback(`Đúng! Còn ${data.strokesRemaining} nét.`, 'ok'),
-    onComplete: data => setStrokeFeedback(data.totalMistakes === 0 ? `Hoàn hảo!` : `Hoàn thành! (sai ${data.totalMistakes} lần)`, 'done')
+    onComplete: data => {
+      setStrokeFeedback(data.totalMistakes === 0 ? `Hoàn hảo!` : `Hoàn thành! (sai ${data.totalMistakes} lần)`, 'done');
+      if (window.HSKTracker && strokeCurrentVocab) {
+        window.HSKTracker.trackStrokeQuiz(APP_CONFIG.level, strokeCurrentVocab, data.totalMistakes);
+      }
+    }
   });
 }
 
@@ -851,6 +904,7 @@ function closeStrokeModal() {
 let currentWordVocab = null;
 function openWordModal(v) {
   currentWordVocab = v;
+  if (window.HSKTracker) window.HSKTracker.trackWordLookup(APP_CONFIG.level, v);
   document.getElementById('wordHanzi').textContent = v.hanzi;
   document.getElementById('wordPinyin').textContent = v.pinyin || '';
   document.getElementById('wordPos').textContent = v.pos || '';

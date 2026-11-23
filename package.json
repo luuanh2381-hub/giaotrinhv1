@@ -1,0 +1,14 @@
+{
+  "name": "hsk-study-companion",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "New HSK 3.0 Study Companion with Neon PostgreSQL Admin Analytics & Vercel Edge Config IP Blocking",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0",
+    "@vercel/edge-config": "^1.4.0",
+    "@vercel/functions": "^2.0.0",
+    "bcryptjs": "^2.4.3",
+    "jose": "^5.9.6"
+  }
+}
